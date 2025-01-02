@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #header {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .menu-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .menu-btn:hover {
+            background-color: #218838;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #f1f1f1;
+            padding: 20px;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .message span {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <button class="menu-btn" onclick="showCreateGroupMenu()">Buat ID Grup</button>
+        <button class="menu-btn" onclick="showJoinGroupMenu()">Cari ID Grup</button>
+    </div>
+
+    <div id="app">
+        <div id="name-section">
+            <h2>Masukkan Nama Kamu</h2>
+            <div class="container">
+                <input type="text" id="userName" placeholder="Nama Kamu">
+                <button onclick="enterChat()">Masuk Chat</button>
+            </div>
+        </div>
+
+        <div id="chat-section" class="hidden">
+            <h2>Selamat Datang, <span id="displayName"></span>!</h2>
+
+            <div id="create-group-menu" class="hidden">
+                <h3>Buat ID Grup Baru</h3>
+                <input type="text" id="newGroupId" placeholder="ID Grup Baru">
+                <button onclick="createGroup()">Buat Grup</button>
+            </div>
+
+            <div id="join-group-menu" class="hidden">
+                <h3>Masukkan ID Grup untuk Bergabung</h3>
+                <input type="text" id="searchGroup" placeholder="Cari ID Grup">
+                <button onclick="joinGroup()">Masuk Grup</button>
+            </div>
+
+            <div id="chat-box" class="hidden">
+                <h3>Grup Chat: <span id="group-name"></span></h3>
+                <div id="messages" class="chat-box"></div>
+                <div class="message-input">
+                    <input type="text" id="messageInput" placeholder="Tulis pesan...">
+                    <button onclick="sendMessage()">Kirim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userName = "";
+        let groupId = "";
+        let currentGroup = "";
+
+        function enterChat() {
+            const nameInput = document.getElementById("userName").value;
+            if (nameInput.trim() !== "") {
+                userName = nameInput;
+                document.getElementById("displayName").innerText = userName;
+                document.getElementById("name-section").classList.add("hidden");
+                document.getElementById("chat-section").classList.remove("hidden");
+            } else {
+                alert("Nama tidak boleh kosong!");
+            }
+        }
+
+        function showCreateGroupMenu() {
+            hideAllMenus();
+            document.getElementById("create-group-menu").classList.remove("hidden");
+        }
+
+        function showJoinGroupMenu() {
+            hideAllMenus();
+            document.getElementById("join-group-menu").classList.remove("hidden");
+        }
+
+        function hideAllMenus() {
+            document.getElementById("create-group-menu").classList.add("hidden");
+            document.getElementById("join-group-menu").classList.add("hidden");
+        }
+
+        function createGroup() {
+            const newGroupId = document.getElementById("newGroupId").value;
+            if (newGroupId && newGroupId.trim() !== "") {
+                currentGroup = newGroupId;
+                document.getElementById("group-name").innerText = currentGroup;
+                document.getElementById("chat-box").classList.remove("hidden");
+                alert(`Grup "${newGroupId}" berhasil dibuat!`);
+                hideAllMenus();
+            } else {
+                alert("Masukkan ID grup yang valid.");
+            }
+        }
+
+        function joinGroup() {
+            const searchGroup = document.getElementById("searchGroup").value;
+            if (searchGroup.trim() !== "") {
+                currentGroup = searchGroup;
+                document.getElementById("group-name").innerText = currentGroup;
+                document.getElementById("chat-box").classList.remove("hidden");
+                alert(`Berhasil masuk ke grup "${currentGroup}"`);
+                hideAllMenus();
+            } else {
+                alert("Masukkan ID grup terlebih dahulu.");
+            }
+        }
+
+        function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+            if (message.trim() !== "") {
+                const messageContainer = document.createElement("div");
+                messageContainer.classList.add("message");
+                messageContainer.innerHTML = `<span>${userName}:</span> ${message}`;
+
+                // Menambahkan pesan ke chat box
+                document.getElementById("messages").appendChild(messageContainer);
+
+                // Kosongkan input message
+                document.getElementById("messageInput").value = "";
+
+                // Scroll ke bawah otomatis
+                document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>
