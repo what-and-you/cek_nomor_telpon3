@@ -1,182 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-time Chat</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-
-        #menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #menu button {
-            background-color: #444;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
-        #menu button:hover {
-            background-color: #555;
-        }
-
-        #chat-container {
-            margin-top: 60px;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        #messages {
-            height: 300px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-        }
-
-        input, button {
-            padding: 10px;
-            margin: 5px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        #groupForm, #chatForm {
-            display: none;
-        }
-
-        #groupForm input, #groupForm button {
-            width: 100%;
-        }
-
-        #nameForm {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-        }
-    </style>
+    <title>Chat Grup</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="username-form">
+        <input type="text" id="username-input" placeholder="Masukkan Username" />
+        <button onclick="setUsername()">Masuk</button>
+    </div>
 
-<div id="menu">
-    <button onclick="showGroupForm()">Buat ID Grup</button>
-    <button onclick="showJoinForm()">Masuk Grup</button>
-</div>
+    <div id="chat-area" style="display:none;">
+        <div id="messages"></div>
+        <input type="text" id="message-input" placeholder="Ketik pesan..." />
+        <button onclick="sendMessage()">Kirim</button>
+    </div>
 
-<div id="nameForm">
-    <h2>Masukkan Nama Pengguna</h2>
-    <input type="text" id="userName" placeholder="Nama Pengguna" onblur="saveName()">
-    <button onclick="saveName()">Simpan Nama</button>
-</div>
-
-<div id="groupForm">
-    <h2>Buat ID Grup</h2>
-    <input type="text" id="groupId" placeholder="ID Grup">
-    <button onclick="createGroup()">Buat Grup</button>
-</div>
-
-<div id="chatForm">
-    <h2>Chat Grup: <span id="currentGroup"></span></h2>
-    <div id="messages"></div>
-    <input type="text" id="messageInput" placeholder="Tulis pesan...">
-    <button onclick="sendMessage()">Kirim</button>
-</div>
-
-<script>
-    const socket = new WebSocket('http:///localhost:8080'); // Ganti dengan server WebSocket kamu
-    let userName = '';
-    let groupId = '';
-
-    // Memastikan nama hanya diminta sekali
-    function saveName() {
-        if (!userName) {
-            userName = document.getElementById('userName').value;
-            if (userName.trim() !== "") {
-                localStorage.setItem('userName', userName);
-                document.getElementById('nameForm').style.display = 'none'; // Sembunyikan form nama
-                showGroupForm();
-            }
-        } else {
-            userName = localStorage.getItem('userName');
-        }
-    }
-
-    // Menampilkan form untuk membuat grup
-    function showGroupForm() {
-        document.getElementById('groupForm').style.display = 'block';
-        document.getElementById('chatForm').style.display = 'none';
-    }
-
-    // Menampilkan form untuk bergabung dengan grup
-    function showJoinForm() {
-        document.getElementById('groupForm').style.display = 'none';
-        document.getElementById('chatForm').style.display = 'block';
-    }
-
-    // Membuat grup dan menyambungkan ke WebSocket
-    function createGroup() {
-        groupId = document.getElementById('groupId').value;
-        if (groupId.trim() !== "") {
-            document.getElementById('currentGroup').textContent = groupId;
-            localStorage.setItem('groupId', groupId);
-            showJoinForm();
-        }
-    }
-
-    // Mengirim pesan ke WebSocket
-    function sendMessage() {
-        const message = document.getElementById('messageInput').value.trim();
-        if (message) {
-            const fullMessage = `${userName}: ${message}`;
-            socket.send(JSON.stringify({ groupId, message: fullMessage }));
-            document.getElementById('messageInput').value = ''; // Bersihkan input
-        }
-    }
-
-    // Menampilkan pesan di layar
-    socket.onmessage = function(event) {
-        const messagesContainer = document.getElementById('messages');
-        const data = JSON.parse(event.data);
-        if (data.groupId === groupId) {
-            const newMessage = document.createElement('div');
-            newMessage.textContent = data.message;
-            messagesContainer.appendChild(newMessage);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll ke pesan terbaru
-        }
-    };
-
-    // Menghubungkan ke server WebSocket
-    socket.onopen = function() {
-        console.log('Connected to WebSocket server');
-    };
-
-    socket.onclose = function() {
-        console.log('Disconnected from WebSocket server');
-    };
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
